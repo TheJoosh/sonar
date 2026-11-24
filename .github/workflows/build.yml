@@ -30,4 +30,4 @@ jobs:
           args: >
             -Dsonar.organization=thejoosh
             -Dsonar.projectKey=TheJoosh_sonar
-      # Extra stuff
+      # Extra stuffs
