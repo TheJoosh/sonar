@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Scanner;
 
 /**
- * This is a class that will handle the file reading
+ * This is a class that will handle the file readings
  */
 class CustomFileReader {
     /**
