@@ -1,7 +1,10 @@
 package edu.byu.cs.sonar;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -11,7 +14,7 @@ class CustomFileReader {
     /**
      * The scanner that will read the dictionary
      */
-    private Scanner s;
+    private final String path;
 
     /**
      * The sentence that will be constructed
@@ -29,13 +32,8 @@ class CustomFileReader {
      */
     CustomFileReader(final String fileName) {
         newSentence = "";
-        try {
-            s = new Scanner(new FileReader(fileName));
-        } catch (FileNotFoundException c) {
-            newSentence = "This isn't going to work out";
-        } finally {
-            count = 0;
-        }
+        path = fileName;
+        count = 0;
     }
 
     /**
@@ -43,11 +41,12 @@ class CustomFileReader {
      *
      * @return how many words in the file
      */
-    int howManyWordsInFile() {
-
-        while (s.hasNext()) {
-            s.next();
-            count++;
+    int howManyWordsInFile() throws FileNotFoundException {
+        try (Scanner s = createScanner()) {
+            while (s.hasNext()) {
+                s.next();
+                count++;
+            }
         }
         return count;
     }
@@ -58,12 +57,20 @@ class CustomFileReader {
      * @param index which number word should be taken back
      * @return correct word
      */
-    String returnThatWord(final int index) {
+    String returnThatWord(final int index) throws FileNotFoundException {
         String returnWord = "";
-        for (int i = 0; i < index; i++) {
-            returnWord = s.next();
+        try (Scanner s = createScanner()) {
+            for (int i=0; i < index; i++) {
+                returnWord=s.next();
+            }
         }
         return returnWord;
+    }
+
+    private Scanner createScanner() throws FileNotFoundException {
+        return new Scanner(new InputStreamReader(
+                new FileInputStream(path), StandardCharsets.UTF_8)
+        );
     }
 
     /**
@@ -72,14 +79,17 @@ class CustomFileReader {
      *
      * @param letter eventually will be the character we are looking for in the word
      */
-    void findNewWord(final CharSequence letter) {
-        String word = s.next();
+    void findNewWord(final CharSequence letter) throws FileNotFoundException {
 
-        while (!word.contains(letter)) {
-            word = s.next();
+        try (Scanner s = createScanner()) {
+            String word=s.next();
+
+            while (!word.contains(letter)) {
+                word=s.next();
+            }
+            newSentence = newSentence + word + " ";
         }
 
-        newSentence = newSentence + word + " ";
     }
 
     /**
@@ -115,8 +125,8 @@ class CustomFileReader {
      *
      * @return the number of words in the dictionary
      */
-    private Scanner getScanner() {
-        return s;
+    private String getPath() {
+        return path;
     }
 
     /**
@@ -167,6 +177,6 @@ class CustomFileReader {
             return false;
         }
 
-        return comparedReader.getScanner() == s;
+        return Objects.equals(comparedReader.getPath(), path);
     }
 }
